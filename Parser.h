@@ -3,22 +3,43 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 /**
  * Defines different types of instructions.
  */
 enum Instruction
 {
-	ADD = 0,	///< Increment the value at the current register by 1.
-	SUB, 		///< Decrement the value at the current register by 1.
-	NEXT,		///< Jump to the next register.
-	PREV,		///< Jump to the previous register.
-	L_BEG,		///< The beginning of a loop.
-	L_END,		///< The end of a loop.
-	I_BEG,		///< The beginning of an if statement. (If value at current register == 0).
-	I_END,		///< The end of an if statement. (If value at current register == 0).
-	OUTPUT,		///< Print the value at the current register to STDOUT (in ASCII format).
-	INPUT		///< Set the value at the current register to the next char from STDIN (in ASCII format).
+	/* Buffer manipulation */
+		ADD = 0,	///< Increment the value at the current register by 1.
+		SUB, 		///< Decrement the value at the current register by 1.
+		NEXT,		///< Jump to the next register.
+		PREV,		///< Jump to the previous register.
+
+	/* IO */
+		OUTPUT,		///< Print the value at the current register to STDOUT (in ASCII format).
+		INPUT,		///< Set the value at the current register to the next char from STDIN (in ASCII format).
+		
+	/* Loops */
+		L_BEG,		///< The beginning of a loop. Checks if the value at the current register == 0.
+		L_END,		///< The end of a loop.
+		
+	/* If blocks */
+		I_BEG,		///< The beginning of an if statement. (If value at current register == 0).
+		I_END,		///< The end of an if statement. (If value at current register == 0).
+		I_ELSE,		///< The beginning of an else block.
+		I_ENDELSE,	///< The end of an else block.
+
+	/* If modifiers */
+		I_NOT,		///< If the value at the current register != 0.
+		I_GT,		///< If the value at the current register is > the value at the next register.
+		I_LT,		///< If the value at the current register is < the value at the next register.
+		I_EQ,		///< If the value at the current register == the value at the next register.
+		I_NEQ,		///< If the value at the current register != the value at the next register.
+
+	/* Other control statements */
+		BREAK,		///< Break out of the current if statement or loop.
+		CONTINUE	///< Continue at the top of the current loop.
 };
 
 /**

@@ -7,7 +7,7 @@ const char* PREFIX =
 "char buffers[131072];\n"
 "for(int i = 0; i < 131072; i++) buffers[i] = 0;\n"
 "unsigned long p = 0;\n"
-"\n";
+"\n\n";
 
 const char* SUFFIX = 
 "std::cout << std::endl;\n"
@@ -52,18 +52,44 @@ void Parser::Parse()
 			case ']':
 				m_instructions.push_back(L_END);
 				break;
-			case '{':
-				m_instructions.push_back(I_BEG);
-				break;
-			case '}':
-				m_instructions.push_back(I_END);
-				break;
 			case '.':
 				m_instructions.push_back(OUTPUT);
 				break;
 			case ',':
 				m_instructions.push_back(INPUT);
 				break;
+			case '{':
+				m_instructions.push_back(I_BEG);
+				break;
+			case '}':
+				m_instructions.push_back(I_END);
+				break;
+			case '(':
+				m_instructions.push_back(I_ELSE);
+				break;
+			case ')':
+				m_instructions.push_back(I_ENDELSE);
+				break;
+			case '!':
+				m_instructions.push_back(I_NOT);
+				break;
+			case '/':
+				m_instructions.push_back(I_GT);
+				break;
+			case '\\':
+				m_instructions.push_back(I_LT);
+				break;
+			case '=':
+				m_instructions.push_back(I_EQ);
+				break;
+			case '#':
+				m_instructions.push_back(I_NEQ);
+				break;
+			case ';':
+				m_instructions.push_back(BREAK);
+				break;
+			case ':':
+				m_instructions.push_back(CONTINUE);
 			default:
 				break;
 		}
@@ -81,10 +107,56 @@ void Parser::Build(Stdin in)
 		switch(inst)
 		{
 			case ADD:
-				m_output.append("buffers[p]++;\n");
+				if(m_instructions[i + 1] != ADD) ///< If there's no point in optimizing.
+				{
+					m_output.append("buffers[p]++;\n");
+					break;
+				}
+
+				int c = 0;
+				bool br = false;
+				for(int ci = 1; !br; ci++) ///< Loop through the ADD instructions
+				{
+					if(m_instructions[i + ci] == ADD)
+						c++;
+					else
+						br = true;
+				}
+
+				std::stringstream ss;
+				std::string s;
+
+				ss << "buffers[p] += " << (c + 1) << ";\n";
+				ss >> s;
+				
+				m_output.append(s);
+				i += c;
 				break;
 			case SUB:
-				m_output.append("buffers[p]--;\n");
+				if(m_instructions[i + 1] != ADD) ///< If there's no point in optimizing.
+				{
+					m_output.append("buffers[p]++;\n");
+					break;
+				}
+
+				int c = 0;
+				bool br = false;
+				for(int ci = 1; !br; ci++) ///< Loop through the ADD instructions
+				{
+					if(m_instructions[i + ci] == ADD)
+						c++;
+					else
+						br = true;
+				}
+
+				std::stringstream ss;
+				std::string s;
+
+				ss << "buffers[p] += " << (c + 1) << ";\n";
+				ss >> s;
+				
+				m_output.append(s);
+				i += c;
 				break;
 			case NEXT:
 				m_output.append("if(p<131072)p++;else p=0;\n");
@@ -99,17 +171,51 @@ void Parser::Build(Stdin in)
 				m_output.append("}\n");
 				break;
 			case I_BEG:
-				m_output.append("if(buffers[p] == 0) {\n");
+				m_output.append("if(buffers[p] ");
+				switch(m_instructions[i-1]) ///< If modifiers.
+				{
+					case I_NOT:
+						m_output.append("!= 0");
+						break;
+					case I_GT:
+						m_output.append(" > buffers[p+1]");
+						break;
+					case I_LT:
+						m_output.append(" < buffers[p+1]");
+						break;
+					case I_EQ:
+						m_output.append(" == buffers[p+1]");
+						break;
+					case I_NEQ:
+						m_output.append(" != buffers[p+1]");
+						break;
+
+					default:
+						break;
+				}
+				m_output.append(")\n\t{\n");
+
 				break;
 			case I_END:
 				m_output.append("}\n");
+				break;
+			case I_ELSE:
+				m_output.append("else\n{\n");
+				break;
+			case I_ENDELSE:
+				m_output.append("}");
 				break;
 			case OUTPUT:
 				m_output.append("std::cout << (char)buffers[p];\n");
 				break;
 			case INPUT:
-				m_output.append("std::cin >> (char)buffers[p];\n");
+				m_output.append("std::cin >> buffers[p];\n");
 				break;
+			case BREAK:
+				m_output.append("break;\n");
+				break;
+			case CONTINUE:
+				m_output.append("continue;\n");
 			default:
 				break;
 			

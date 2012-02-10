@@ -1,0 +1,64 @@
+<h1>Brainfuck++ Reference</h1>
+
+<p>The Brainfuck++ language is an esoteric programming language, based on the popular language Brainfuck.
+It features the same instruction set as Brainfuck, but adds if blocks.</p>
+
+<p>The compiler works by parsing the Brainfuck++ code and turning it into compileable C++.</p>
+
+<h2>How to use if-blocks</h2>
+
+<p>To check if the value at the current register is equal to 0, simply type:</p>
+
+<pre><code>{code}
+</code></pre>
+
+<p>The code inside the curlybrackets will be run if the value at the current register is equal to 0.
+But wait, there's more!
+To check for other things (i.e. if the value is NOT equal to 0), you use If block modifiers.
+They should be placed before the opening of an if block.
+I.e. to check if the value at the current register is not equal to 0, use this:</p>
+
+<pre><code>!{code}
+</code></pre>
+
+<p>For a full reference of if block modifiers, see this list:</p>
+
+<ul>
+<li><strong>!</strong> If the value at the current register != 0.</li>
+<li><strong>/</strong> If the value at the current register is > than the value at the next register.</li>
+<li><strong>\</strong>    If the value at the current register is &lt; than the value at the next register.</li>
+<li><strong>=</strong> If the value at the current register == the value at the next register.</li>
+<li><strong>#</strong> If the value at the current register != the value at the next register.</li>
+</ul>
+
+<p>There's also else blocks, which are simply parenteses. They are used like this:</p>
+
+<pre><code>(code)
+</code></pre>
+
+<p>So a full if-block with a modifier and an else statement would look like this:</p>
+
+<pre><code>={if}(else)
+&gt;{if}(else)
+</code></pre>
+
+<p>Of course, you replace <em>if</em> and <em>else</em> with your own brainfuck statements.</p>
+
+<h2>Full reference sheet</h2>
+
+<ul>
+<li><strong>+</strong>    Increment the value at the current register by 1.</li>
+<li><strong>-</strong>    Decrement the value at the current register by 1.</li>
+<li><strong>></strong> Jump to the next register.</li>
+<li><strong>&lt;</strong> Jump to the previous register.</li>
+<li><strong>.</strong> Print the value at the current register to STDOUT (in ASCII format).</li>
+<li><strong>,</strong> Set the value at the current register to the next char from STDIN (in ASCII format).</li>
+<li><strong>[</strong> The beginning of a loop. runs until the value at the current register == 0.</li>
+<li><strong>]</strong> The end of a loop.</li>
+<li><strong>{</strong> The beginning of an if statement. Checks if the value at the current register == 0 if there's no modifier before it.</li>
+<li><strong>}</strong> The end of an if statement.</li>
+<li><strong>(</strong> The beginning of an else statement.</li>
+<li><strong>)</strong> The end of an else statement.</li>
+<li><strong>;</strong> Break out of the current if statement or loop.</li>
+<li><strong>:</strong> Continue at the top of the current loop.</li>
+</ul>
